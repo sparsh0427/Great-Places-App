@@ -34,6 +34,23 @@ class _ImageInputState extends State<ImageInput> {
     widget.onSelectImage(savedImage);
   }
 
+    Future<void> _takePicture_gallery() async {
+    final imageFile = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 600,
+    );
+    if (imageFile == null) {
+      return;
+    }
+    setState(() {
+      _storedImage = imageFile;
+    });
+    final appDir = await syspaths.getApplicationDocumentsDirectory();
+    final fileName = path.basename(imageFile.path);
+    final savedImage = await imageFile.copy('${appDir.path}/$fileName');
+    widget.onSelectImage(savedImage);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -59,14 +76,20 @@ class _ImageInputState extends State<ImageInput> {
         SizedBox(
           width: 10,
         ),
-        Expanded(
-          child: FlatButton.icon(
-            icon: Icon(Icons.camera),
-            label: Text('Take Picture'),
-            textColor: Theme.of(context).primaryColor,
-            onPressed: _takePicture,
-          ),
+        Column(children: <Widget>[
+        FlatButton.icon(
+          icon: Icon(Icons.photo_camera),
+          label: Text('Take Picture'),
+          textColor: Theme.of(context).primaryColor,
+          onPressed: _takePicture,
         ),
+        FlatButton.icon(
+          icon: Icon(Icons.photo_library),
+          label: Text('Take Picture'),
+          textColor: Theme.of(context).primaryColor,
+          onPressed: _takePicture_gallery,
+        ),
+        ],)
       ],
     );
   }
